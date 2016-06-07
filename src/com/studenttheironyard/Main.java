@@ -14,7 +14,7 @@ public class Main {
         Spark.init();
         Spark.get(
                 "/",
-                (request, response) ->  {
+                (request, response) -> {
                     Session session = request.session();
                     String username = session.attribute("username");
                     HashMap m = new HashMap();
@@ -41,8 +41,7 @@ public class Main {
                     if (user == null) {
                         user = new User(name, pass);
                         users.put(name, user);
-                    }
-                    else if (!pass.equals(user.name)) {
+                    } else if (!pass.equals(user.name)) {
                         throw new Exception("Wrong password");
                     }
 
@@ -71,7 +70,7 @@ public class Main {
 
                     User user = users.get(username);
 
-                    if(user == null) {
+                    if (user == null) {
                         throw new Exception("User does not exist");
                     }
                     Restaurant r = new Restaurant(name, location, rating, comment);
@@ -81,8 +80,6 @@ public class Main {
                     return "";
 
                 }
-
-
         );
         Spark.post(
                 "/logout",
@@ -105,9 +102,15 @@ public class Main {
                     int id = Integer.valueOf(request.queryParams("id"));
 
                     User user = users.get(username);
-                    user.restaurants.remove(id-1);
-                }
-        )
+                    if (id <= 0 || id - 1 >= user.restaurants.size()) {
+                        throw new Exception("Invalid id");
+                    }
+                    user.restaurants.remove(id - 1);
 
+                    response.redirect("/");
+                    return "";
+                }
+        );
     }
+
 }
