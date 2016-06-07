@@ -21,6 +21,8 @@ public class Main {
                     if (username == null) {
                         return new ModelAndView(m, "login.html");
                     } else {
+                        User user = users.get(username);
+                        m.put("restaurants", user.restaurants);
                         return new ModelAndView(m, "home.html");
                     }
                 },
@@ -40,7 +42,7 @@ public class Main {
                         user = new User(name, pass);
                         users.put(name, user);
                     }
-                    else if (!name.equals(user.name)) {
+                    else if (!pass.equals(user.name)) {
                         throw new Exception("Wrong password");
                     }
 
@@ -51,6 +53,61 @@ public class Main {
                     return "";
                 }
         );
+        Spark.post(
+                "/create-restaurant",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    if (username == null) {
+                        throw new Exception("Not logged in");
+                    }
+                    String name = request.params("name");
+                    String location = request.queryParams("location");
+                    int rating = Integer.valueOf(request.queryParams("rating"));
+                    String comment = request.queryParams("comment");
+                    if (name == null || location == null || comment == null) {
+                        throw new Exception("Invalid form fields");
+                    }
+
+                    User user = users.get(username);
+
+                    if(user == null) {
+                        throw new Exception("User does not exist");
+                    }
+                    Restaurant r = new Restaurant(name, location, rating, comment);
+                    user.restaurants.add(r);
+
+                    response.redirect("/");
+                    return "";
+
+                }
+
+
+        );
+        Spark.post(
+                "/logout",
+                (request, response) -> {
+                    Session session = request.session();
+                    session.invalidate();
+                    response.redirect("/");
+                    return "/";
+                }
+        );
+        Spark.post(
+                "/delete-restaurant",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    if (username == null) {
+                        throw new Exception("Not logged in");
+                    }
+
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    User user = users.get(username);
+                    user.restaurants.remove(id-1);
+                }
+        )
 
     }
 }
