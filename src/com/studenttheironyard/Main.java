@@ -67,9 +67,7 @@ public class Main {
                     if (name == null || location == null || comment == null) {
                         throw new Exception("Invalid form fields");
                     }
-
                     User user = users.get(username);
-
                     if (user == null) {
                         throw new Exception("User does not exist");
                     }
