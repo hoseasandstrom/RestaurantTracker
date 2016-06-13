@@ -1,16 +1,24 @@
 package com.studenttheironyard;
 
+import org.h2.tools.Server;
 import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
     static HashMap<String,User> users = new HashMap<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+        Server.createWebServer().start();
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        Statement stmt = conn.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS restaurants(id IDENTITY, name VARCHAR, location VARCHAR, rating INT, comment VARCHAR)");
+
         Spark.init();
         Spark.get(
                 "/",
@@ -64,9 +72,9 @@ public class Main {
                     String location = request.queryParams("location");
                     int rating = Integer.valueOf(request.queryParams("rating"));
                     String comment = request.queryParams("comment");
-                    if (name == null || location == null || comment == null) {
-                        throw new Exception("Invalid form fields");
-                    }
+                    //if (name == null || location == null || comment == null) {
+                        //throw new Exception("Invalid form fields");
+                   // }
                     User user = users.get(username);
                     if (user == null) {
                         throw new Exception("User does not exist");
@@ -110,5 +118,19 @@ public class Main {
                 }
         );
     }
+
+    public static void insertRestaurant(Connection conn, String name, String location, int rating, String comment) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO restaurants VALUES(NULL, ?, ?, ?, ? )");
+        stmt.setString(1, name);
+        stmt.setString(2, location);
+        stmt.setInt(3, rating);
+        stmt.setString(4, comment);
+        stmt.execute();
+
+    }
+
+    public static ArrayList<Restaurant>
+
+
 
 }
