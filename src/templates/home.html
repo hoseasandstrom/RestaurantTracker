@@ -22,15 +22,19 @@
     <button type="submit">Submit Restaurant</button>
 </form>
 
-<form action="/delete-restaurant" method="post">
-    <input type="number" name="id" placeholder="#"/>
-    <button type="submit">Delete Restaurant</button>
-</form>
 <br>
 <ol>
     {{#restaurants}}
     <li>
         <b>{{name}}</b> - {{location}} - {{rating}}/5 - {{comment}}
+        <form action="/edit-restaurant" method="get">
+            <input type="hidden" name="id" value="{{id}}">
+            <button type="submit">Edit Review</button>
+        </form>
+        <form action="/delete-restaurant" method="post">
+            <input type="number" name="id" placeholder="#"/>
+            <button type="submit">Delete Restaurant</button>
+    </form>
     </li>
     {{/restaurants}}
 </ol>
